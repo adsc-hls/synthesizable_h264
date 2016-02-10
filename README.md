@@ -110,8 +110,10 @@ If the result is same as golden output file, the program will output as "PASS".
 The decode yuv file is testresult.yuv.
 
 ***HLS Testing***
-
-run the shell script ./hls.sh
+Run Vivado HLS (tested with Vivado HLS 2014.4)
+```
+vivado_hls script.tcl
+```
 
 It will go through 3 steps: C verification, Synthesis, and Co-simulation
 (using Verilog with xsim as simulator). Simulation with SystemC is recommended
