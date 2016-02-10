@@ -72,7 +72,7 @@ This code is tested under and aimed for vivado High level synthesis tool 2014.4.
 
 Please make sure vivado HLS is installed and make sure command line "vivado_hls" take effect.
 
-###make###
+***make***
 
 The binary file ldecode will be generated in the directory bin.
 THe source code is located in directory tpdn_opt. 
