@@ -43,5 +43,5 @@ csim_design -clean -argv {test.264 test_dec.yuv}
 
 csynth_design
 
-cosim_design -clean -argv {test.264 test_dec.yuv} -trace_level none -rtl systemc -tool xsim
+cosim_design -argv {test.264 test_dec.yuv} -trace_level none -rtl systemc -tool xsim
 
