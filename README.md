@@ -122,3 +122,8 @@ To simulate with SystemC, replace "verilog" with "systemc" at the last line
 of the file script.tcl.
 
 The solution result is in tpdn_hls/solution_onboard
+
+Contact
+-------
+For bug report, please email Xinheng Liu at <xliu79@illinois.edu>.
+

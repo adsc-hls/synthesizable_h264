@@ -1,34 +1,25 @@
-Terms of Use
+Copyright (c) <2016> <University of Illinois at Urbana-Champaign>
+All rights reserved.
 
-University of Illinois at Urbana-Champaign and the authors provide these benchmark files to you subject to the Terms of Use, which may be updated by us from time to time without notice to you. The most up-to-date Terms of Use can be found on Prof. Deming Chen’s homepage (“Website”) at http://dchen.ece.illinois.edu/tools.html.
+Developed by: 		
 
-By using the H.264 HLS Benchmark ("Benchmark"), you acknowledge that you have read the most up-to-date Terms of Use and agree to abide by the Terms of Use (“Terms”).
+<ES CAD Group>
+<University of Illinois at Urbana-Champaign>
+<http://dchen.ece.illinois.edu/>
 
-License Agreement
+<Hardware Research Group>
+<Advanced Digital Sciences Center>
+<http://adsc.illinois.edu/>
 
-University of Illinois at Urbana-Champaign grants, free of charge, to any users the right to modify, copy, and redistribute the Benchmark, both within the user's organization and externally, subject to the following restrictions:
 
-1. The users agree to uses this Benchmark for research purposes only. Users interested in using the Benchmark for commercial purposes can contact Prof. Deming Chen (dchen@illinois.edu) for discussion of commercial licensing terms.
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal with the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
-2. In any product based on the Benchmark, the users agree to acknowledge the Research Group that developed the Benchmark. This acknowledgment shall appear in the product documentation.
+    * Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimers.
+    * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimers in the documentation and/or other materials provided with the distribution.
+    * Neither the names of the Development Groups and the names of the Institutions, nor the names of its contributors may be used to endorse or promote products derived from this Software without specific prior written permission. 
 
-3. The users agree to obey all U.S. Government restrictions governing redistribution or export of the Benchmark.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE CONTRIBUTORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH THE SOFTWARE. 
 
-4. The users agree to reproduce any copyright notice which appears on the Benchmark on any copy or modification of such made available to others.
-
-Additional Terms
-
-You agree to appropriately acknowledge and reference the work by University of Illinois at Urbana-Champaign in all publications, presentations, and/or other works derived from the use, in part or in whole, of this Benchmark and/or its variants. 
-
-When referencing this Benchmark in a publication, please cite:
+When referencing this application in a publication, please cite:
 
 X. Liu, Y. Chen, T. Nguyen, S. Gurumani, K. Rupnow, and D. Chen, “High Level Synthesis of Complex Applications: An H.264 Video Decoder”, Proceedings of ACM/SIGDA International Symposium on Field Programmable Gate Arrays, February 2016. 
-
-Disclaimer and Limitation of Liability
-
-This Benchmark is provided to you “As Is,” without warranty of any kind, either expressed or implied. By using this Benchmark, you agree that you and your representing institution or company will not hold University of Illinois at Urbana-Champaign, the Benchmark creator, the Benchmark authors, as well as all other contributing members to the Benchmark and its official distribution, liable for damage of any kind resulting from the download or use of the Benchmark and its files and documents.
-
-Legal Notice
-
-This Benchmark, including the files, documents, and inherent ideas, are protected by United States Copyright Law and United States Patent Law. University of Illinois at Urbana-Champaign and the authors reserve all rights. Unauthorized reproduction of the files and/or the documents included in the Benchmark package is unlawful.
-
