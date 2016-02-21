@@ -1,3 +1,20 @@
+//============================================================================//
+//    H.264 High Level Synthesis Benchmark
+//    Copyright (c) <2016>
+//    <University of Illinois at Urbana-Champaign>
+//    All rights reserved.
+//
+//    Developed by:
+//
+//    <ES CAD Group>
+//        <University of Illinois at Urbana-Champaign>
+//        <http://dchen.ece.illinois.edu/>
+//
+//    <Hardware Research Group>
+//        <Advanced Digital Sciences Center>
+//        <http://adsc.illinois.edu/>
+//============================================================================//
+
 #include <string.h>
 
 #include "global.h"

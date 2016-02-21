@@ -1,3 +1,20 @@
+//============================================================================//
+//    H.264 High Level Synthesis Benchmark
+//    Copyright (c) <2016>
+//    <University of Illinois at Urbana-Champaign>
+//    All rights reserved.
+//
+//    Developed by:
+//
+//    <ES CAD Group>
+//        <University of Illinois at Urbana-Champaign>
+//        <http://dchen.ece.illinois.edu/>
+//
+//    <Hardware Research Group>
+//        <Advanced Digital Sciences Center>
+//        <http://adsc.illinois.edu/>
+//============================================================================//
+
 #ifndef _RESIDUAL_H_
 #define _RESIDUAL_H_
 void scale_and_inv_trans_Intra16x16DC(int qP, int c[4][4], int qPm6, int scale1, int scale2, int scale3);
