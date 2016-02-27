@@ -28,13 +28,10 @@ void ProcessSH(seq_parameter_set_rbsp_t *active_sps,pic_parameter_set_rbsp_t *ac
 //void process_pred_weight_table(pred_weight_table_rbsp_t* PWT, char B_slice,pic_parameter_set_rbsp_t *pps, NALU_t *nalu);
 void intepretSLiceHeader(
     slice_header_rbsp_t *sliceheader,
-	seq_parameter_set_rbsp_t *sps,
-	pic_parameter_set_rbsp_t *pps,
-	unsigned char nalu_idc,
-	unsigned char nalu_ref_idc,
-	ImageParameters *img,
-	StorablePicture PicBuff[MAX_REFERENCE_PICTURES]);
-
-
-
+    seq_parameter_set_rbsp_t *sps,
+    pic_parameter_set_rbsp_t *pps,
+    unsigned char nalu_idc,
+    unsigned char nalu_ref_idc,
+    ImageParameters *img,
+    StorablePicture PicBuff[MAX_REFERENCE_PICTURES]);
 #endif

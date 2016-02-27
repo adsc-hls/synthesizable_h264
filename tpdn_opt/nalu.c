@@ -38,7 +38,7 @@ int GetAnnexbNALU (NALU_t *nalu,FILE* bits)
 
   if ((Buf = (unsigned char*)calloc (MAXNALBUFFERSIZE , sizeof(char))) == NULL)
   {
-      puts("not enough memory");
+    puts("not enough memory");
     exit(-1);
   }
 
@@ -46,7 +46,7 @@ int GetAnnexbNALU (NALU_t *nalu,FILE* bits)
   if(feof(bits))
   {
     if(pos==0)
-    return 0;
+      return 0;
     else
     {
       printf( "GetAnnexbNALU can't read start code\n");
@@ -103,25 +103,25 @@ int GetAnnexbNALU (NALU_t *nalu,FILE* bits)
       while(Buf[pos-2-TrailingZero8Bits]==0)
         TrailingZero8Bits++;
       nalu->len = (pos-1)-nalu->startcodeprefix_len-LeadingZero8BitsCount-TrailingZero8Bits;
-        if(nalu->len > MAXNALBUFFERSIZE)
-        {
-        #if _N_HLS_
-          printf("lengh of NAL unit is larger than maxmum buffer size!");
-        #endif
-          exit(-1);
-        }
+      if(nalu->len > MAXNALBUFFERSIZE)
+      {
+#if _N_HLS_
+        printf("lengh of NAL unit is larger than maxmum buffer size!");
+#endif
+        exit(-1);
+      }
       memcpy (nalu->buf, &Buf[LeadingZero8BitsCount+nalu->startcodeprefix_len], nalu->len);
       nalu->forbidden_bit = (nalu->buf[0]>>7) & 1;
       nalu->nal_reference_idc = (nalu->buf[0]>>5) & 3;
       nalu->nal_unit_type = (nalu->buf[0]) & 0x1f;
 
-// printf ("GetAnnexbNALU, eof case: pos %d nalu->len %d, nalu->reference_idc %d, nal_unit_type %d \n", pos, nalu->len, nalu->nal_reference_idc, nalu->nal_unit_type);
+      // printf ("GetAnnexbNALU, eof case: pos %d nalu->len %d, nalu->reference_idc %d, nal_unit_type %d \n", pos, nalu->len, nalu->nal_reference_idc, nalu->nal_unit_type);
 
 #if TRACE
-  fprintf (p_trace, "\n\nLast NALU in File\n\n");
-  fprintf (p_trace, "Annex B NALU w/ %s startcode, len %d, forbidden_bit %d, nal_reference_idc %d, nal_unit_type %d\n\n",
-    nalu->startcodeprefix_len == 4?"long":"short", nalu->len, nalu->forbidden_bit, nalu->nal_reference_idc, nalu->nal_unit_type);
-  fflush (p_trace);
+      fprintf (p_trace, "\n\nLast NALU in File\n\n");
+      fprintf (p_trace, "Annex B NALU w/ %s startcode, len %d, forbidden_bit %d, nal_reference_idc %d, nal_unit_type %d\n\n",
+          nalu->startcodeprefix_len == 4?"long":"short", nalu->len, nalu->forbidden_bit, nalu->nal_reference_idc, nalu->nal_unit_type);
+      fflush (p_trace);
 #endif
       free(Buf);
       return pos-1;
@@ -166,9 +166,9 @@ int GetAnnexbNALU (NALU_t *nalu,FILE* bits)
   nalu->len = (pos+rewind)-nalu->startcodeprefix_len-LeadingZero8BitsCount-TrailingZero8Bits;
   if(nalu->len > MAXNALBUFFERSIZE)
   {
-  #if _N_HLS_
+#if _N_HLS_
     printf("lengh of NAL unit is larger than maxmum buffer size!");
-  #endif
+#endif
     exit(-1);
   }
   memcpy (nalu->buf, &Buf[LeadingZero8BitsCount+nalu->startcodeprefix_len], nalu->len);
@@ -177,10 +177,10 @@ int GetAnnexbNALU (NALU_t *nalu,FILE* bits)
   nalu->nal_unit_type = (nalu->buf[0]) & 0x1f;
 
 
-//printf ("GetAnnexbNALU, regular case: pos %d nalu->len %d, nalu->reference_idc %d, nal_unit_type %d \n", pos, nalu->len, nalu->nal_reference_idc, nalu->nal_unit_type);
+  //printf ("GetAnnexbNALU, regular case: pos %d nalu->len %d, nalu->reference_idc %d, nal_unit_type %d \n", pos, nalu->len, nalu->nal_reference_idc, nalu->nal_unit_type);
 #if TRACE
   fprintf (p_trace, "\n\nAnnex B NALU w/ %s startcode, len %d, forbidden_bit %d, nal_reference_idc %d, nal_unit_type %d\n\n",
-    nalu->startcodeprefix_len == 4?"long":"short", nalu->len, nalu->forbidden_bit, nalu->nal_reference_idc, nalu->nal_unit_type);
+      nalu->startcodeprefix_len == 4?"long":"short", nalu->len, nalu->forbidden_bit, nalu->nal_reference_idc, nalu->nal_unit_type);
   fflush (p_trace);
 #endif
 

@@ -105,52 +105,52 @@ typedef unsigned char byte;
 
 typedef struct
 {
-    int startcodeprefix_len;      //! 4 for parameter sets and first slice in picture, 3 for everything else (suggested)
-    unsigned len;                 //! Length of the NAL unit (Excluding the start code, which does not belong to the NALU)
-    int nal_unit_type;            //! NALU_TYPE_xxxx
-    int nal_reference_idc;        //! NALU_PRIORITY_xxxx
-    int forbidden_bit;            //! should be always FALSE
-    unsigned long int bit_offset;
-    unsigned long int bit_length;
-    unsigned char buf[MAXNALBUFFERSIZE];        //! contains the first byte followed by the EBSP
+  int startcodeprefix_len;      //! 4 for parameter sets and first slice in picture, 3 for everything else (suggested)
+  unsigned len;                 //! Length of the NAL unit (Excluding the start code, which does not belong to the NALU)
+  int nal_unit_type;            //! NALU_TYPE_xxxx
+  int nal_reference_idc;        //! NALU_PRIORITY_xxxx
+  int forbidden_bit;            //! should be always FALSE
+  unsigned long int bit_offset;
+  unsigned long int bit_length;
+  unsigned char buf[MAXNALBUFFERSIZE];        //! contains the first byte followed by the EBSP
 } NALU_t;
 
 //Structure for SPS
 typedef struct
 {
-    Boolean   Valid;                  // indicates the parameter set is valid
-    unsigned char profile_idc;                                      // u(8)
-    Boolean   constrained_set0_flag;                            // u(1)
-    Boolean   constrained_set1_flag;                            // u(1)
-    Boolean   constrained_set2_flag;                            // u(1)
-    unsigned char level_idc;                                        // u(8)
-    unsigned  seq_parameter_set_id;                             // ue(v)
-    unsigned  log2_max_frame_num_minus4;                        // ue(v)
-    unsigned pic_order_cnt_type;
-    // if( pic_order_cnt_type == 0 )
-    unsigned log2_max_pic_order_cnt_lsb_minus4;                 // ue(v)
-    // else if( pic_order_cnt_type == 1 )
-    Boolean delta_pic_order_always_zero_flag;               // u(1)
-    int     offset_for_non_ref_pic;                         // se(v)
-    int     offset_for_top_to_bottom_field;                 // se(v)
-    unsigned  num_ref_frames_in_pic_order_cnt_cycle;          // ue(v)
-    // for( i = 0; i < num_ref_frames_in_pic_order_cnt_cycle; i++ )
-    int   offset_for_ref_frame[MAXnum_ref_frames_in_pic_order_cnt_cycle];   // se(v)
-    unsigned  max_num_ref_frames;                                   // ue(v)
-    Boolean   gaps_in_frame_num_value_allowed_flag;             // u(1)
-    unsigned  pic_width_in_mbs_minus1;                          // ue(v)
-    unsigned  pic_height_in_map_units_minus1;                   // ue(v)
-    Boolean   frame_mbs_only_flag;                              // u(1)
-    // if( !frame_mbs_only_flag )
-    Boolean   mb_adaptive_frame_field_flag;                   // u(1)
-    Boolean   direct_8x8_inference_flag;                        // u(1)
-    Boolean   frame_cropping_flag;                              // u(1)
-    unsigned  frame_cropping_rect_left_offset;                // ue(v)
-    unsigned  frame_cropping_rect_right_offset;               // ue(v)
-    unsigned  frame_cropping_rect_top_offset;                 // ue(v)
-    unsigned  frame_cropping_rect_bottom_offset;              // ue(v)
-    Boolean   vui_parameters_present_flag;                      // u(1)
-    //vui_seq_parameters_t vui_seq_parameters;                  // vui_seq_parameters_t
+  Boolean   Valid;                  // indicates the parameter set is valid
+  unsigned char profile_idc;                                      // u(8)
+  Boolean   constrained_set0_flag;                            // u(1)
+  Boolean   constrained_set1_flag;                            // u(1)
+  Boolean   constrained_set2_flag;                            // u(1)
+  unsigned char level_idc;                                        // u(8)
+  unsigned  seq_parameter_set_id;                             // ue(v)
+  unsigned  log2_max_frame_num_minus4;                        // ue(v)
+  unsigned pic_order_cnt_type;
+  // if( pic_order_cnt_type == 0 )
+  unsigned log2_max_pic_order_cnt_lsb_minus4;                 // ue(v)
+  // else if( pic_order_cnt_type == 1 )
+  Boolean delta_pic_order_always_zero_flag;               // u(1)
+  int     offset_for_non_ref_pic;                         // se(v)
+  int     offset_for_top_to_bottom_field;                 // se(v)
+  unsigned  num_ref_frames_in_pic_order_cnt_cycle;          // ue(v)
+  // for( i = 0; i < num_ref_frames_in_pic_order_cnt_cycle; i++ )
+  int   offset_for_ref_frame[MAXnum_ref_frames_in_pic_order_cnt_cycle];   // se(v)
+  unsigned  max_num_ref_frames;                                   // ue(v)
+  Boolean   gaps_in_frame_num_value_allowed_flag;             // u(1)
+  unsigned  pic_width_in_mbs_minus1;                          // ue(v)
+  unsigned  pic_height_in_map_units_minus1;                   // ue(v)
+  Boolean   frame_mbs_only_flag;                              // u(1)
+  // if( !frame_mbs_only_flag )
+  Boolean   mb_adaptive_frame_field_flag;                   // u(1)
+  Boolean   direct_8x8_inference_flag;                        // u(1)
+  Boolean   frame_cropping_flag;                              // u(1)
+  unsigned  frame_cropping_rect_left_offset;                // ue(v)
+  unsigned  frame_cropping_rect_right_offset;               // ue(v)
+  unsigned  frame_cropping_rect_top_offset;                 // ue(v)
+  unsigned  frame_cropping_rect_bottom_offset;              // ue(v)
+  Boolean   vui_parameters_present_flag;                      // u(1)
+  //vui_seq_parameters_t vui_seq_parameters;                  // vui_seq_parameters_t
 } seq_parameter_set_rbsp_t;
 
 // structure for PPS
@@ -283,23 +283,23 @@ typedef struct
 //Picture
 typedef struct
 {
-    int Picorder_num;
-    unsigned char memoccupied;
-    unsigned char frame_num;
-    unsigned char type;
-    unsigned char use_for_char;
+  int Picorder_num;
+  unsigned char memoccupied;
+  unsigned char frame_num;
+  unsigned char type;
+  unsigned char use_for_char;
 
-    unsigned char Sluma[PicWidthInSamplesL][FrameHeightInSampleL];
-    unsigned char SChroma[2][PicWidthInSamplesC][FrameHeightInSampleC];
+  unsigned char Sluma[PicWidthInSamplesL][FrameHeightInSampleL];
+  unsigned char SChroma[2][PicWidthInSamplesC][FrameHeightInSampleC];
 } StorablePicture;
 
 //Picture info
 typedef struct
 {
-    char refIdxL0[PicWidthInMBs*2][FrameHeightInMbs*2];
-    char refIdxL1[PicWidthInMBs*2][FrameHeightInMbs*2];
-    int mvd_l0[PicWidthInMBs*4][FrameHeightInMbs*4][2];
-    int mvd_l1[PicWidthInMBs*4][FrameHeightInMbs*4][2];
+  char refIdxL0[PicWidthInMBs*2][FrameHeightInMbs*2];
+  char refIdxL1[PicWidthInMBs*2][FrameHeightInMbs*2];
+  int mvd_l0[PicWidthInMBs*4][FrameHeightInMbs*4][2];
+  int mvd_l1[PicWidthInMBs*4][FrameHeightInMbs*4][2];
 } StorablePictureInfo;
 
 
