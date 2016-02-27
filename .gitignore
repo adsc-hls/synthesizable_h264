@@ -1,5 +1,8 @@
+dependencies
 bin
 obj
-*.yuv
+testresult.yuv
 *log
 tpdn_hls
+*.swp
+*~
