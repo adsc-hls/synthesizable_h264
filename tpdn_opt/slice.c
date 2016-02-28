@@ -38,14 +38,12 @@ void write_luma
 
 #pragma HLS ARRAY_PARTITION variable=pred complete dim=1
 #pragma HLS ARRAY_PARTITION variable=pred complete dim=2
-#pragma HLS pipeline
   int i,j;
 
   for(i=0;i<4;i++)
-    #pragma HLS UNROLL factor=2
     for(j=0;j<4;j++)
     {
-      #pragma HLS UNROLL factor=2
+      #pragma HLS PIPELINE rewind
       Sluma[startx+i][starty+j]=Clip1y( skip*rMb[i][j]+pred[i][j]);
     }
 
@@ -67,14 +65,12 @@ void write_Chroma
 
 #pragma HLS ARRAY_PARTITION variable=pred complete dim=1
 #pragma HLS ARRAY_PARTITION variable=pred complete dim=2
-#pragma HLS pipeline
   int i,j;
 
   for(i=0;i<4;i++)
-    #pragma HLS UNROLL factor=2
     for(j=0;j<4;j++)
     {
-      #pragma HLS UNROLL factor=2
+      #pragma HLS PIPELINE rewind
       SChroma[startx+i][starty+j]=Clip1y((skip==0)*rMb[i][j]+pred[i][j]);
     }
 }
@@ -154,11 +150,9 @@ void process_luma(
   {
     NzLuma[mbaddrx*4+x][mbaddry*4+y]=0;
     for(i=0;i<4;i++)
-#pragma HLS pipeline
-#pragma HLS unroll
+      #pragma HLS PIPELINE
       for(j=0;j<4;j++)
       {
-
         coeffACL[i][j]=0;
       }
   }
@@ -343,11 +337,9 @@ void process_chroma
   {
     NzChroma[mbaddrx*2+x][mbaddry*2+y]=0;
     for(i=0;i<4;i++)
-      #pragma HLS pipeline
-      #pragma unroll
+      #pragma HLS PIPELINE
       for(j=0;j<4;j++)
       {
-
         rMbC[i][j]=0;
         coeffACC[i][j]=0;
       }
@@ -359,7 +351,7 @@ void process_chroma
   if(refidx0>=0 && refidx1>=0)
   {
     LOOP_COPY: for(i=0;i<2;i++)
-      #pragma HLS pipeline
+      #pragma HLS PIPELINE
       for(j=0;j<2;j++)
       {
         mvdC0[i][j][0]=mvd0[x*2+i][y*2+j][0];
@@ -373,8 +365,7 @@ void process_chroma
   else if(refidx0>=0 && refidx1<0)
   {
     LOOP_COPY2: for(i=0;i<2;i++)
-      #pragma HLS pipeline
-      #pragma unroll
+      #pragma HLS PIPELINE
       for(j=0;j<2;j++)
       {
         mvdC0[i][j][0]=mvd0[x*2+i][y*2+j][0];
@@ -385,8 +376,7 @@ void process_chroma
   else if(refidx0<0 && refidx1>=0)
   {
     LOOP_COPY3: for(i=0;i<2;i++)
-      #pragma HLS pipeline
-      #pragma unroll
+      #pragma HLS PIPELINE
       for(j=0;j<2;j++)
       {
         mvdC0[i][j][0]=mvd1[x*2+i][y*2+j][0];
@@ -625,10 +615,9 @@ void ProcessSlice
         // Set Intra prediction info
         LOOP_ZERO_INTRAMODED:for(i=0;i<4;i++)
         {
-          #pragma HLS pipeline
-          #pragma HLS UNROLL factor=2
-         IntraPredMode[mbaddrx*4+3][mbaddry*4+i]=2;
-         IntraPredMode[mbaddrx*4+i][mbaddry*4+3]=2;
+          #pragma HLS UNROLL
+          IntraPredMode[mbaddrx*4+3][mbaddry*4+i]=2;
+          IntraPredMode[mbaddrx*4+i][mbaddry*4+3]=2;
         }
 
 
@@ -665,7 +654,7 @@ void ProcessSlice
         {
           for(i=0;i<4;i++)
           {
-            #pragma HLS pipeline
+            #pragma HLS UNROLL
             IntraPredMode[mbaddrx*4+3][mbaddry*4+i]=2;
             IntraPredMode[mbaddrx*4+i][mbaddry*4+3]=2;
           }

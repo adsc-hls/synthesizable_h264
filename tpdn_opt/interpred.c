@@ -790,7 +790,7 @@ void inter_prediction_chroma_subblock_single(
 #pragma HLS ARRAY_PARTITION variable=mv complete dim=3
 
 
-#pragma HLS pipeline
+//#pragma HLS PIPELINE
   int i,j;
   int x,y;
   int x0,y0;
@@ -805,7 +805,6 @@ void inter_prediction_chroma_subblock_single(
 
 
   for(i=0;i<2;i++)
-    #pragma HLS unroll
     for(j=0;j<2;j++)
     {
       xint=mv[i][j][0]>>3;
@@ -814,17 +813,20 @@ void inter_prediction_chroma_subblock_single(
       yfrac=(mv[i][j][1]&0x07);
 
       for(x=0;x<3;x++)
-        #pragma HLS unroll
+      #pragma HLS UNROLL
         for(y=0;y<3;y++)
         {
+          #pragma HLS UNROLL
           x0=Clip3(0,PicWidthInSamplesC-1,startblkx+x+xint+i*2);
           y0=Clip3(0,FrameHeightInSampleC-1,startblky+y+yint+j*2);
           temp[x][y]=Schroma[x0][y0];
         }
 
       for(x=0;x<2;x++)
+      #pragma HLS UNROLL
         for(y=0;y<2;y++)
         {
+          #pragma HLS UNROLL
           Schroma_cur[startblkx+x+i*2][startblky+y+j*2]=Clip1y(flag*rMbC[x+i*2][y+j*2]+(((8-xfrac)*(8-yfrac)*temp[x][y]+xfrac*(8-yfrac)*temp[x+1][y]+(8-xfrac)*yfrac*temp[x][y+1]+xfrac*yfrac*temp[x+1][y+1]+32)>>6 ) );
 
         }
@@ -854,7 +856,7 @@ void inter_prediction_chroma_subblock_double(
 #pragma HLS ARRAY_PARTITION variable=mv1 complete dim=1
 #pragma HLS ARRAY_PARTITION variable=mv1 complete dim=2
 #pragma HLS ARRAY_PARTITION variable=mv1 complete dim=3
-#pragma HLS pipeline
+//#pragma HLS PIPELINE
   int i,j;
   int x,y;
   int x0,y0;
@@ -876,7 +878,6 @@ void inter_prediction_chroma_subblock_double(
 
 
   for(i=0;i<2;i++)
-    #pragma HLS unroll
     for(j=0;j<2;j++)
     {
 
@@ -893,18 +894,20 @@ void inter_prediction_chroma_subblock_double(
       yfrac1=(mv1[i][j][1]&0x07);
 
       for(x=0;x<3;x++)
-        #pragma HLS unroll
+      #pragma HLS UNROLL
         for(y=0;y<3;y++)
         {
+          #pragma HLS UNROLL
           x0=Clip3(0,PicWidthInSamplesC-1,startblkx+x+xint0+i*2);
           y0=Clip3(0,FrameHeightInSampleC-1,startblky+y+yint0+j*2);
           temp0[x][y]=Schroma0[x0][y0];
         }
 
       for(x=0;x<3;x++)
-        #pragma HLS unroll
+      #pragma HLS UNROLL
         for(y=0;y<3;y++)
         {
+          #pragma HLS UNROLL
           x0=Clip3(0,PicWidthInSamplesC-1,startblkx+x+xint1+i*2);
           y0=Clip3(0,FrameHeightInSampleC-1,startblky+y+yint1+j*2);
           temp1[x][y]=Schroma1[x0][y0];
@@ -912,8 +915,10 @@ void inter_prediction_chroma_subblock_double(
 
 
       for(x=0;x<2;x++)
+      #pragma HLS UNROLL
         for(y=0;y<2;y++)
         {
+          #pragma HLS UNROLL
           Schroma_cur[startblkx+x+i*2][startblky+y+j*2]=Clip1y(flag*rMbC[x+i*2][y+j*2]+
               ( ( (((8-xfrac0)*(8-yfrac0)*temp0[x][y]+xfrac0*(8-yfrac0)*temp0[x+1][y]+(8-xfrac0)*yfrac0*temp0[x][y+1]+xfrac0*yfrac0*temp0[x+1][y+1]+32)>>6 )
                   +(((8-xfrac1)*(8-yfrac1)*temp1[x][y]+xfrac1*(8-yfrac1)*temp1[x+1][y]+(8-xfrac1)*yfrac1*temp1[x][y+1]+xfrac1*yfrac1*temp1[x+1][y+1]+32)>>6 )
@@ -935,12 +940,11 @@ void copy_j(unsigned char Sluma[PicWidthInSamplesL][FrameHeightInSampleL], int x
 
 #pragma HLS ARRAY_PARTITION variable=temp complete dim=1
 #pragma HLS ARRAY_PARTITION variable=temp complete dim=2
-#pragma HLS pipeline
+#pragma HLS PIPELINE
   int i,j;
   int x,y;
 
   for(i=0;i<9;i++)
-    #pragma HLS unroll
     for(j=0;j<9;j++)
     {
       x=Clip3(0,PicWidthInSamplesL-1,xint-2+i);
@@ -955,12 +959,11 @@ void copy_H(unsigned char Sluma[PicWidthInSamplesL][FrameHeightInSampleL],int xi
 {
 #pragma HLS ARRAY_PARTITION variable=temp complete dim=1
 #pragma HLS ARRAY_PARTITION variable=temp complete dim=2
-#pragma HLS pipeline
+#pragma HLS PIPELINE
   int i,j;
   int x,y;
 
   for(i=0;i<9;i++)
-    #pragma HLS unroll
     for(j=2;j<6;j++)
     {
       x=Clip3(0,PicWidthInSamplesL-1,xint-2+i);
@@ -974,12 +977,11 @@ void copy_V(unsigned char Sluma[PicWidthInSamplesL][FrameHeightInSampleL],int xi
 
 #pragma HLS ARRAY_PARTITION variable=temp complete dim=1
 #pragma HLS ARRAY_PARTITION variable=temp complete dim=2
-#pragma HLS pipeline
+#pragma HLS PIPELINE
   int i,j;
   int x,y;
 
   for(i=2;i<6;i++)
-    #pragma HLS unroll
     for(j=0;j<9;j++)
     {
       x=Clip3(0,PicWidthInSamplesL-1,xint-2+i+xoffset);
@@ -995,12 +997,11 @@ void copy_Cross(unsigned char Sluma[PicWidthInSamplesL][FrameHeightInSampleL], i
 
 #pragma HLS ARRAY_PARTITION variable=temp complete dim=1
 #pragma HLS ARRAY_PARTITION variable=temp complete dim=2
-#pragma HLS pipeline
+#pragma HLS PIPELINE
   int i,j;
   int x,y;
 
   for(i=0;i<9;i++)
-    #pragma HLS unroll
     for(j=0;j<9;j++)
     {
       if( (i>1+xoffset&&i<6+xoffset) || (j>1+yoffset&&j<6+yoffset))
@@ -1018,11 +1019,10 @@ void copy_G(unsigned char Sluma[PicWidthInSamplesL][FrameHeightInSampleL], int x
 
 #pragma HLS ARRAY_PARTITION variable=temp complete dim=1
 #pragma HLS ARRAY_PARTITION variable=temp complete dim=2
-#pragma HLS pipeline
+#pragma HLS PIPELINE
   int i,j;
 
   for(i=2;i<6;i++)
-    #pragma HLS unroll
     for(j=2;j<6;j++)
     {
       temp[i][j]=Sluma[xint-2+i][yint-2+j];
@@ -1073,10 +1073,9 @@ void inter_luma_double_bizero_skip
   int x0,y0;
   int x1,y1;
   for(i=0;i<4;i++)
-    #pragma HLS unroll factor=4
     for(j=0;j<4;j++)
     {
-      #pragma HLS unroll factor=4
+      #pragma HLS UNROLL
       x0=Clip3(0,PicWidthInSamplesL-1,xint0+i);
       y0=Clip3(0,FrameHeightInSampleL-1,yint0+j);
       x1=Clip3(0,PicWidthInSamplesL-1,xint1+i);
@@ -1115,7 +1114,7 @@ void inter_luma_double_skip
 #pragma HLS ARRAY_PARTITION variable=rMb complete dim=2
 
 
-#pragma HLS pipeline
+//#pragma HLS PIPELINE
   int sum0,sum1;
   unsigned char h0,b0,h1,b1;
   unsigned char G0,G1;
@@ -1127,9 +1126,9 @@ void inter_luma_double_skip
 
 
   for(i=0;i<4;i++)
+    #pragma HLS PIPELINE
     for(j=0;j<4;j++)
     {
-      #pragma HLS unroll factor=2
       if(yfrac0>0 && xfrac0!=2)
         h0=Clip1y((temp0[i+2+xoffset0][j]-5*temp0[i+2+xoffset0][j+1]+20*temp0[i+2+xoffset0][j+2]+20*temp0[i+2+xoffset0][j+3]-5*temp0[i+2+xoffset0][j+4]+temp0[i+2+xoffset0][j+5]+16)>>5);
       else
@@ -1145,7 +1144,6 @@ void inter_luma_double_skip
       {
         sum0=0;
         for(x=0;x<6;x++)
-          #pragma HLS unroll
           for(y=0;y<6;y++)
           {
             sum0=sum0+temp0[x+i][y+j]*inter_tab[x][y];
@@ -1180,7 +1178,6 @@ void inter_luma_double_skip
       {
         sum1=0;
         for(x=0;x<6;x++)
-          #pragma HLS unroll
           for(y=0;y<6;y++)
           {
             sum1=sum1+temp1[x+i][y+j]*inter_tab[x][y];
@@ -1222,7 +1219,7 @@ void inter_luma_single
 #pragma HLS ARRAY_PARTITION variable=rMb complete dim=1
 #pragma HLS ARRAY_PARTITION variable=rMb complete dim=2
 
-#pragma HLS pipeline
+//#pragma HLS PIPELINE
   int sum;
   unsigned char h,b;
   unsigned char G;
@@ -1232,9 +1229,9 @@ void inter_luma_single
   int x,y;
 
   for(i=0;i<4;i++)
+    #pragma HLS PIPELINE
     for(j=0;j<4;j++)
     {
-      #pragma HLS unroll factor=2
       if(yfrac>0 && xfrac!=2)
         h=Clip1y((temp[i+2+xoffset][j]-5*temp[i+2+xoffset][j+1]+20*temp[i+2+xoffset][j+2]+20*temp[i+2+xoffset][j+3]-5*temp[i+2+xoffset][j+4]+temp[i+2+xoffset][j+5]+16)>>5);
       else
@@ -1250,7 +1247,6 @@ void inter_luma_single
       {
         sum=0;
         for(x=0;x<6;x++)
-          #pragma HLS unroll
           for(y=0;y<6;y++)
           {
             sum=sum+temp[x+i][y+j]*inter_tab[x][y];

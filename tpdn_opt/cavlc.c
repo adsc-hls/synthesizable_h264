@@ -191,7 +191,7 @@ void TrailingOnes_TotalCoeff(NALU_t *nalu, unsigned char *TotalCoeff, unsigned c
 
   for(j=0;j<4;j++) 
   {
-    #pragma HLS pipeline
+    #pragma HLS PIPELINE
     for(i=0;i<17;i++)
     {
       len=lentab[nC_range][j][i];
@@ -227,7 +227,7 @@ void TrailingOnes_TotalCoeff_ChromaDc(NALU_t *nalu, unsigned char *TotalCoeff, u
 
   for(i=0;i<4;i++) 
   {
-  #pragma HLS pipeline
+    #pragma HLS PIPELINE
     for (j=0;j<5;j++)
     {
       len=lentabDC[i][j];
@@ -251,6 +251,7 @@ void TrailingOnes_TotalCoeff_ChromaDc(NALU_t *nalu, unsigned char *TotalCoeff, u
 
 unsigned char total_zeros(NALU_t *nalu, unsigned char tzVLC)
 {
+#pragma HLS PIPELINE
   int len,cod;
   int i;
   int a, b;
@@ -264,7 +265,7 @@ unsigned char total_zeros(NALU_t *nalu, unsigned char tzVLC)
 
   for(i=0;i<15;i++)
   {
-    #pragma HLS pipeline
+    //#pragma HLS PIPELINE
     len = tzlentab[tzVLC-1][i];
     cod = tzcodtab[tzVLC-1][i];
     unsigned char test = (showbits(len,temp0,offset) == cod);
@@ -281,6 +282,7 @@ unsigned char total_zeros(NALU_t *nalu, unsigned char tzVLC)
 
 unsigned char total_zeros_DC(NALU_t *nalu, unsigned char tzVLC)
 {
+#pragma HLS PIPELINE
   int len,cod;
   int i;
   int a, b;
@@ -294,7 +296,7 @@ unsigned char total_zeros_DC(NALU_t *nalu, unsigned char tzVLC)
 
   for(i=0;i<4;i++)
   {
-    #pragma HLS pipeline
+    //#pragma HLS PIPELINE
     len = tzlentabDC[tzVLC-1][i];
     cod = tzcodtabDC[tzVLC-1][i];
     unsigned char test = (showbits(len,temp0,offset) == cod);
@@ -311,6 +313,7 @@ unsigned char total_zeros_DC(NALU_t *nalu, unsigned char tzVLC)
 
 unsigned char run_before(NALU_t *nalu, unsigned char tzVLC)
 {
+#pragma HLS PIPELINE
   int len,cod;
   int i;
   unsigned char tmp;
@@ -328,7 +331,7 @@ unsigned char run_before(NALU_t *nalu, unsigned char tzVLC)
   unsigned int temp0 = bytes_reverse_32(*temp);
   for(i=0;i<15;i++)
   {
-    #pragma HLS pipeline
+    //#pragma HLS PIPELINE
     len = rblentab[tmp][i];
     cod = rbcodtab[tmp][i];
     unsigned char test = (showbits(len,temp0,offset) == cod);
@@ -357,8 +360,7 @@ unsigned char unary_code(NALU_t *nalu)
 unsigned char residual_block_cavlc_16(int coeffLevel[4][4], NALU_t *nalu,int startIdx, int endIdx,int nC)
 {
 #pragma HLS ARRAY_PARTITION variable=coeffLevel complete dim=1
-#pragma HLS ARRAY_PARTITION variable=coeffLevel complete dim=1
-#pragma HLS pipeline
+#pragma HLS ARRAY_PARTITION variable=coeffLevel complete dim=2
 
   const unsigned char framescan[16][2]=
   {
@@ -390,7 +392,6 @@ unsigned char residual_block_cavlc_16(int coeffLevel[4][4], NALU_t *nalu,int sta
     nC_range=2;
   for(i=0;i<16;i++)
   {
-    #pragma HLS pipeline
     #pragma HLS UNROLL
     coeffLevel[i/4][i%4]=0;
   }
@@ -403,7 +404,6 @@ unsigned char residual_block_cavlc_16(int coeffLevel[4][4], NALU_t *nalu,int sta
     suffixLength= (totalcoeff > 10 && trailingOnes <3) ? 1:0;
     LOOP_OUTER:for(i=0;i<totalcoeff;i++)
     {
-      #pragma HLS pipeline
       if(i<trailingOnes)
       {
         trailing_ones_sign_flag=u_1(nalu);
@@ -468,13 +468,6 @@ unsigned char residual_block_cavlc_16(int coeffLevel[4][4], NALU_t *nalu,int sta
          {
            suffixLength=1;
          }
-         /*
-            int temp;
-            if (levelVal[i]>0)
-            temp=levelVal[i];
-            else
-            temp=-levelVal[i];
-            */
          if(ABSS(levelVal[i])> (3<<(suffixLength-1)) && suffixLength<6)
          {
            suffixLength++;
@@ -490,8 +483,7 @@ unsigned char residual_block_cavlc_16(int coeffLevel[4][4], NALU_t *nalu,int sta
 
     LOOP_INNER1:for(i=0;i<totalcoeff-1;i++)
     {
-      #pragma HLS pipeline
-      #pragma HLS UNROLL
+      #pragma HLS PIPELINE
       if(zeroLeft > 0 )
       {
         runVal[i]=run_before(nalu, zeroLeft);
@@ -507,8 +499,7 @@ unsigned char residual_block_cavlc_16(int coeffLevel[4][4], NALU_t *nalu,int sta
     int coeffNum=-1;
     LOOPINNER2:for(i=totalcoeff-1;i>=0;i--)
     {
-      #pragma HLS pipeline
-      #pragma HLS UNROLL
+      #pragma HLS PIPELINE
       coeffNum+=runVal[i]+1;
       coeffLevel[framescan[startIdx+coeffNum][0]][framescan[startIdx+coeffNum][1]]=levelVal[i];
     }
@@ -518,9 +509,8 @@ unsigned char residual_block_cavlc_16(int coeffLevel[4][4], NALU_t *nalu,int sta
 
 unsigned char residual_block_cavlc_4(int coeffLevel[2][2], NALU_t *nalu,int startIdx, int endIdx)
 {
-#pragma HLS pipeline
 #pragma HLS ARRAY_PARTITION variable=coeffLevel complete dim=1
-#pragma HLS ARRAY_PARTITION variable=coeffLevel complete dim=1
+#pragma HLS ARRAY_PARTITION variable=coeffLevel complete dim=2
   int i;
   unsigned char trailingOnes;
   unsigned char totalcoeff;

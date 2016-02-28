@@ -118,7 +118,7 @@ void predict_intra4x4_luma_NonField(
     int starty,
     unsigned int blk)
 {
-#pragma HLS pipeline
+#pragma HLS PIPELINE
 
 
   unsigned char P_X, P_A, P_B,P_C,P_D,P_E,P_F,P_G,P_H,P_I,P_J,P_K,P_L;
@@ -208,7 +208,6 @@ void predict_intra4x4_luma_NonField(
         // HLS PIPELINE
         for (i=0; i <4; i++)
         {
-
           // store DC prediction
           predL[i][j] = s0;
         }
@@ -541,15 +540,10 @@ void prediction_Chroma(
   int a;
   int temp;
 
-
-  for(i=0;i<8;i++)
-  {
-#pragma HLS unroll factor=2
-    if(avaimode/2)
-      h[i]=SChroma[startx-1][starty+i];
-    else
-      h[i]=128;
-  }
+  if(avaimode/2)
+    for(i=0;i<8;i++) h[i]=SChroma[startx-1][starty+i];
+  else
+    for(i=0;i<8;i++) h[i]=128;
 
   if(avaimode%2)
     for(i=0;i<8;i++) v[i]=SChroma[startx+i][starty-1];
@@ -624,7 +618,7 @@ void prediction_Chroma(
         int i,j;
 
         for(i=0;i<2;i++)
-          #pragma HLS pipeline
+          #pragma HLS PIPELINE
           for(j=0;j<2;j++)
             for(x=0;x<4;x++)
               for(y=0;y<4;y++)
@@ -638,7 +632,7 @@ void prediction_Chroma(
 
 
       for(k=0;k<4;k++)
-        #pragma HLS pipeline
+        #pragma HLS PIPELINE
         for(i=0;i<4;i++)
           for(j=0;j<4;j++)
           {
@@ -648,6 +642,7 @@ void prediction_Chroma(
     case 2:
       //prediction_Chroma_Vertical(predC,SChroma,startx,starty);
       for(k=0;k<4;k++)
+        #pragma HLS PIPELINE
         for(i=0;i<4;i++)
           for(j=0;j<4;j++)
           {
@@ -665,7 +660,7 @@ void prediction_Chroma(
       a=16*(v[7]+h[7]);
 
       for(k=0;k<4;k++)
-        #pragma HLS pipeline
+        #pragma HLS PIPELINE
         for(i=0;i<4;i++)
           for(j=0;j<4;j++)
           {
