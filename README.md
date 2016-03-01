@@ -5,7 +5,7 @@ Introduction
 ------------
 
 This software package contains source code of a synthesizable C code version of H264 decoder with certain specified format. The source code is largely modified and rewritten based on the H.264/AVC JM Reference Software version 8.6 to be synthesizable, i.e. High-level Synthesis tools are able to synthesize the source code to RTL. The decoder accepts **.264** format as input and **.yuv** video file as output.
-This software package also provides the shell script which automatically run the HLS and RTL cosimulation process for the RTL decoder.
+This software package also provides the TCL script which automatically run the HLS and RTL cosimulation process for the RTL decoder.
 
 
 Test Case Source
@@ -69,7 +69,6 @@ Please note, the resolution size should be a multiple of 16.
 HLS tool requirement
 --------------------
 This code is tested under Vivado High-level Synthesis (HLS) tool version 2014.4.  
-(see http://www.xilinx.com/support/download/index.html/content/xilinx/en/downloadNav/vivado-design-tools/2014-4.html for details)
 
 Please make sure Vivado HLS is installed and make sure command line `vivado_hls` takes effect by updating your environment variable PATH.
 
@@ -103,6 +102,7 @@ For 352 x 288 decoder, set
 ```
 
 use command `make clean && make` to compile the C source file.
+
 ***C testing***
 
 run `./ctest.sh` to check the correctness of decoder.
@@ -111,6 +111,7 @@ If the result is same as golden output file, the program will output "PASS".
 The decode yuv file is **testresult.yuv**.
 
 ***HLS Testing***
+
 Run Vivado HLS (tested with Vivado HLS 2014.4)
 ```
 vivado_hls script.tcl
