@@ -34,7 +34,7 @@ add_files -tb input/test.264
 add_files -tb golden/test_dec.yuv
 
 
-open_solution -reset "solution_onboard"
+open_solution -reset "solution1"
 set_part {xc7vx690tffg1761-2}
 create_clock -period 10 -name default
 
