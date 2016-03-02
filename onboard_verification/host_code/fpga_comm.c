@@ -1,3 +1,7 @@
+//Given a physical address, allocate a specified amount of memory
+//corresponding to that physical address
+//Reference: http://falsinsoft.blogspot.sg/2013/10/access-physical-memory-in-linux.html
+
 #include "fpga_comm.h"
 
 void *mem_alloc(int size, unsigned int base_addr, int mem_dev)

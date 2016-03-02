@@ -60,11 +60,11 @@
 #define MbWidth_C   8
 #define MbHeight_C  8
 
-#define PicWidthInMBs 11
+#define PicWidthInMBs 40
 #define PicWidthInSamplesL (PicWidthInMBs*16)
 #define PicWidthInSamplesC	(PicWidthInMBs*MbWidth_C)
 
-#define FrameHeightInMbs 9
+#define FrameHeightInMbs 30
 #define FrameHeightInSampleL	(FrameHeightInMbs*16)
 #define FrameHeightInSampleC	(FrameHeightInMbs*MbHeight_C)
 
