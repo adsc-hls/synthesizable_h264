@@ -290,7 +290,8 @@ typedef struct
   unsigned char use_for_char;
 
   unsigned char Sluma[PicWidthInSamplesL][FrameHeightInSampleL];
-  unsigned char SChroma[2][PicWidthInSamplesC][FrameHeightInSampleC];
+  unsigned char SChroma_0[PicWidthInSamplesC][FrameHeightInSampleC];
+  unsigned char SChroma_1[PicWidthInSamplesC][FrameHeightInSampleC];
 } StorablePicture;
 
 //Picture info

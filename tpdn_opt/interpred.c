@@ -940,13 +940,15 @@ void copy_j(unsigned char Sluma[PicWidthInSamplesL][FrameHeightInSampleL], int x
 
 #pragma HLS ARRAY_PARTITION variable=temp complete dim=1
 #pragma HLS ARRAY_PARTITION variable=temp complete dim=2
-#pragma HLS PIPELINE
+//#pragma HLS PIPELINE
   int i,j;
   int x,y;
 
   for(i=0;i<9;i++)
+  #pragma HLS UNROLL
     for(j=0;j<9;j++)
     {
+      #pragma HLS UNROLL
       x=Clip3(0,PicWidthInSamplesL-1,xint-2+i);
       y=Clip3(0,FrameHeightInSampleL-1,yint-2+j);
       temp[i][j]=Sluma[x][y];
@@ -959,13 +961,15 @@ void copy_H(unsigned char Sluma[PicWidthInSamplesL][FrameHeightInSampleL],int xi
 {
 #pragma HLS ARRAY_PARTITION variable=temp complete dim=1
 #pragma HLS ARRAY_PARTITION variable=temp complete dim=2
-#pragma HLS PIPELINE
+//#pragma HLS PIPELINE
   int i,j;
   int x,y;
 
   for(i=0;i<9;i++)
+  #pragma HLS UNROLL
     for(j=2;j<6;j++)
     {
+      #pragma HLS UNROLL
       x=Clip3(0,PicWidthInSamplesL-1,xint-2+i);
       y=Clip3(0,FrameHeightInSampleL-1,yint-2+j+yoffset);
       temp[i][j+yoffset]=Sluma[x][y];
@@ -977,13 +981,15 @@ void copy_V(unsigned char Sluma[PicWidthInSamplesL][FrameHeightInSampleL],int xi
 
 #pragma HLS ARRAY_PARTITION variable=temp complete dim=1
 #pragma HLS ARRAY_PARTITION variable=temp complete dim=2
-#pragma HLS PIPELINE
+//#pragma HLS PIPELINE
   int i,j;
   int x,y;
 
   for(i=2;i<6;i++)
+  #pragma HLS UNROLL
     for(j=0;j<9;j++)
     {
+      #pragma HLS UNROLL
       x=Clip3(0,PicWidthInSamplesL-1,xint-2+i+xoffset);
       y=Clip3(0,FrameHeightInSampleL-1,yint-2+j);
       temp[i+xoffset][j]=Sluma[x][y];
@@ -997,13 +1003,15 @@ void copy_Cross(unsigned char Sluma[PicWidthInSamplesL][FrameHeightInSampleL], i
 
 #pragma HLS ARRAY_PARTITION variable=temp complete dim=1
 #pragma HLS ARRAY_PARTITION variable=temp complete dim=2
-#pragma HLS PIPELINE
+//#pragma HLS PIPELINE
   int i,j;
   int x,y;
 
   for(i=0;i<9;i++)
+  #pragma HLS UNROLL
     for(j=0;j<9;j++)
     {
+      #pragma HLS UNROLL
       if( (i>1+xoffset&&i<6+xoffset) || (j>1+yoffset&&j<6+yoffset))
       {
         x=Clip3(0,PicWidthInSamplesL-1,xint-2+i);
@@ -1019,12 +1027,14 @@ void copy_G(unsigned char Sluma[PicWidthInSamplesL][FrameHeightInSampleL], int x
 
 #pragma HLS ARRAY_PARTITION variable=temp complete dim=1
 #pragma HLS ARRAY_PARTITION variable=temp complete dim=2
-#pragma HLS PIPELINE
+//#pragma HLS PIPELINE
   int i,j;
 
   for(i=2;i<6;i++)
+  #pragma HLS UNROLL
     for(j=2;j<6;j++)
     {
+      #pragma HLS UNROLL
       temp[i][j]=Sluma[xint-2+i][yint-2+j];
     }
 }
@@ -1075,7 +1085,6 @@ void inter_luma_double_bizero_skip
   for(i=0;i<4;i++)
     for(j=0;j<4;j++)
     {
-      #pragma HLS UNROLL
       x0=Clip3(0,PicWidthInSamplesL-1,xint0+i);
       y0=Clip3(0,FrameHeightInSampleL-1,yint0+j);
       x1=Clip3(0,PicWidthInSamplesL-1,xint1+i);
@@ -1144,8 +1153,10 @@ void inter_luma_double_skip
       {
         sum0=0;
         for(x=0;x<6;x++)
+        //#pragma HLS UNROLL
           for(y=0;y<6;y++)
           {
+            //#pragma HLS UNROLL
             sum0=sum0+temp0[x+i][y+j]*inter_tab[x][y];
           }
         sum0=(sum0+512)>>10;
@@ -1178,8 +1189,10 @@ void inter_luma_double_skip
       {
         sum1=0;
         for(x=0;x<6;x++)
+        //#pragma HLS UNROLL
           for(y=0;y<6;y++)
           {
+            //#pragma HLS UNROLL
             sum1=sum1+temp1[x+i][y+j]*inter_tab[x][y];
           }
         sum1=(sum1+512)>>10;
@@ -1247,8 +1260,10 @@ void inter_luma_single
       {
         sum=0;
         for(x=0;x<6;x++)
+        //#pragma HLS UNROLL
           for(y=0;y<6;y++)
           {
+            //#pragma HLS UNROLL
             sum=sum+temp[x+i][y+j]*inter_tab[x][y];
           }
         sum=(sum+512)>>10;

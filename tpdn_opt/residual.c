@@ -30,6 +30,7 @@ void matrix_mult4x4(int A[4][4], int B[4][4], int C[4][4])
       sum = 0;
       for(k=0; k<4; k++)
       {
+        //#pragma HLS UNROLL
         sum += A[i][k]*B[k][j];
       }
       C[i][j] = sum;
@@ -87,9 +88,16 @@ void scale_and_inv_trans_Intra16x16DC(int qP, int c[4][4], int qPm6, int scale1,
     {1,  1, -1, -1},
     {1, -1, -1,  1},
     {1, -1,  1, -1}};
+#pragma HLS ARRAY_PARTITION variable=inv1 dim=1 complete
+#pragma HLS ARRAY_PARTITION variable=inv1 dim=2 complete
 
 
   int	f[4][4], temp[4][4], LevelScale4x4;
+#pragma HLS ARRAY_PARTITION variable=temp dim=1 complete
+#pragma HLS ARRAY_PARTITION variable=temp dim=2 complete
+#pragma HLS ARRAY_PARTITION variable=f dim=1 complete
+#pragma HLS ARRAY_PARTITION variable=f dim=2 complete
+
   LevelScale4x4 = get_LevelScale4x4(qPm6, 0, 0);
 
 
@@ -99,34 +107,50 @@ void scale_and_inv_trans_Intra16x16DC(int qP, int c[4][4], int qPm6, int scale1,
 
   if(qP>=36)
     for(i=0; i<4; i++)
+    #pragma HLS UNROLL
       for(j=0; j<4; j++)
+      #pragma HLS UNROLL
         c[i][j] = (f[i][j] * LevelScale4x4) << scale1;
   else
     for(i=0; i<4; i++)
+    #pragma HLS UNROLL
       for(j=0; j<4; j++)
+      #pragma HLS UNROLL
         c[i][j] = (f[i][j] * LevelScale4x4 + scale3) >> scale2;
 
 }
 
 void scale_residual4x4_and_trans_inverse(int qP, int qPm6, int temp1, int temp2, int temp3, int c[4][4], int r[4][4], int DC_comp,unsigned char flag) /* 8.5.12.1 */
 {
-#pragma HLS PIPELINE
+//#pragma HLS PIPELINE
 
   int i, j;
 
   int temp[4][4];
   int tmp[4][4];
+#pragma HLS ARRAY_PARTITION variable=temp dim=1 complete
+#pragma HLS ARRAY_PARTITION variable=temp dim=2 complete
+#pragma HLS ARRAY_PARTITION variable=tmp dim=1 complete
+#pragma HLS ARRAY_PARTITION variable=tmp dim=2 complete
+#pragma HLS ARRAY_PARTITION variable=c dim=1 complete
+#pragma HLS ARRAY_PARTITION variable=c dim=2 complete
+#pragma HLS ARRAY_PARTITION variable=r dim=1 complete
+#pragma HLS ARRAY_PARTITION variable=r dim=2 complete
 
   //temp1=qP/6 - 4;
   //tmp=4 - qP/6;
   //temp3=1 << (3 - qP/6);
   if(qP >= 24)
     for(i=0; i<4; i++)
+    #pragma HLS UNROLL
       for(j = 0;j<4; j++)
+      #pragma HLS UNROLL
         temp[i][j] = (c[i][j] * vt[qPm6][i&0x01][j&0x01]) << temp1;
   else
     for(i=0; i<4; i++)
+    #pragma HLS UNROLL
       for(j = 0;j<4; j++)
+      #pragma HLS UNROLL
         temp[i][j] = (c[i][j] * vt[qPm6][i&0x01][j&0x01] + temp3) >> temp2;
 
   if(flag)
@@ -134,9 +158,12 @@ void scale_residual4x4_and_trans_inverse(int qP, int qPm6, int temp1, int temp2,
 
   int i1,j1, e[4], f[4];
 
+#pragma HLS ARRAY_PARTITION variable=e dim=1 complete
+#pragma HLS ARRAY_PARTITION variable=f dim=1 complete
+
   for (j=0;j<BLOCK_SIZE;j++)
   {
-
+    #pragma HLS UNROLL
     f[0]=(temp[0][j]+temp[2][j]);
     f[1]=(temp[0][j]-temp[2][j]);
     f[2]=(temp[1][j]>>1)-temp[3][j];
@@ -144,6 +171,7 @@ void scale_residual4x4_and_trans_inverse(int qP, int qPm6, int temp1, int temp2,
 
     for (i=0;i<2;i++)
     {
+      #pragma HLS UNROLL
       i1=3-i;
       tmp[i][j]=f[i]+f[i1];
       tmp[i1][j]=f[i]-f[i1];
@@ -152,8 +180,7 @@ void scale_residual4x4_and_trans_inverse(int qP, int qPm6, int temp1, int temp2,
   // vertical
   for (i=0;i<BLOCK_SIZE;i++)
   {
-
-
+    #pragma HLS UNROLL
     f[0]=(tmp[i][0]+tmp[i][2]);
     f[1]=(tmp[i][0]-tmp[i][2]);
     f[2]=(tmp[i][1]>>1)-tmp[i][3];
@@ -161,6 +188,7 @@ void scale_residual4x4_and_trans_inverse(int qP, int qPm6, int temp1, int temp2,
 
     for (j=0;j<2;j++)
     {
+      #pragma HLS UNROLL
       j1=3-j;
       r[i][j] =(f[j]+f[j1]+32)>>6;
       r[i][j1]=(f[j]-f[j1]+32)>>6;
@@ -171,7 +199,7 @@ void scale_residual4x4_and_trans_inverse(int qP, int qPm6, int temp1, int temp2,
 
 void scale_and_inv_trans_chroma2x2(int c[2][2],int qP, int qPcm6) /* 8.5.11 */
 {
-#pragma HLS PIPELINE
+//#pragma HLS PIPELINE
   int tran[2][2];
   int temp;
   int i,j;
@@ -183,11 +211,17 @@ void scale_and_inv_trans_chroma2x2(int c[2][2],int qP, int qPcm6) /* 8.5.11 */
   tran[0][1]=c[0][0]+c[1][0]-c[0][1]-c[1][1];
   tran[1][1]=c[0][0]-c[1][0]-c[0][1]+c[1][1];
 
+#pragma HLS ARRAY_PARTITION variable=c dim=1 complete
+#pragma HLS ARRAY_PARTITION variable=c dim=2 complete
+#pragma HLS ARRAY_PARTITION variable=tran dim=1 complete
+#pragma HLS ARRAY_PARTITION variable=tran dim=2 complete
 
   for(i=0; i<2; i++)
   {
+    #pragma HLS UNROLL
     for(j=0; j<2; j++)
     {
+      #pragma HLS UNROLL
       c[i][j] = ((tran[i][j]*temp) << (qP/6)) >> 5;
     }
   }

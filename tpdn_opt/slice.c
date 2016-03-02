@@ -273,33 +273,39 @@ void process_luma(
 void process_chroma
 (
  unsigned char CodedPatternChroma,
- unsigned char NzChroma[PicWidthInMBs*2][FrameHeightInMbs*2],
+ unsigned char NzChroma[2][PicWidthInMBs*2][FrameHeightInMbs*2],
  unsigned char Imode[PicWidthInMBs][FrameHeightInMbs],
  int mbaddrx,
  int mbaddry,
- int x,
- int y,
  NALU_t* nalu,
  char qPc,
  char qPcm6,
  char temp1c,
  char temp2c,
  char temp3c,
- int coeffDCC,
- int refidx0,
- int refidx1,
+ int coeffDCC_0[4][2],
+ int coeffDCC_1[4][2],
+ char refidx0[2][2],
+ char refidx1[2][2],
  int mvd0[4][4][2],
  int mvd1[4][4][2],
  ImageParameters* img,
  unsigned char tmpImode,
- unsigned char predC[4][4],
- StorablePicture PIC[MAX_REFERENCE_PICTURES],
- int icrcb
+ unsigned char predC_0[4][4][4],
+ unsigned char predC_1[4][4][4],
+ StorablePicture PIC[MAX_REFERENCE_PICTURES]
  )
 
 {
-#pragma HLS ARRAY_PARTITION variable=predC complete dim=1
-#pragma HLS ARRAY_PARTITION variable=predC complete dim=2
+#pragma HLS ARRAY_PARTITION variable=predC_0 complete dim=2
+#pragma HLS ARRAY_PARTITION variable=predC_0 complete dim=3
+#pragma HLS ARRAY_PARTITION variable=predC_1 complete dim=2
+#pragma HLS ARRAY_PARTITION variable=predC_1 complete dim=3
+
+#pragma HLS ARRAY_PARTITION variable=coeffDCC_0 complete dim=1
+#pragma HLS ARRAY_PARTITION variable=coeffDCC_0 complete dim=2
+#pragma HLS ARRAY_PARTITION variable=coeffDCC_1 complete dim=1
+#pragma HLS ARRAY_PARTITION variable=coeffDCC_1 complete dim=2
 
 #pragma HLS ARRAY_PARTITION variable=mvd0 complete dim=1
 #pragma HLS ARRAY_PARTITION variable=mvd0 complete dim=2
@@ -309,13 +315,20 @@ void process_chroma
 #pragma HLS ARRAY_PARTITION variable=mvd1 complete dim=3
 
   int nC;
-  int coeffACC[4][4];
-#pragma HLS ARRAY_PARTITION variable=coeffACC complete dim=1
-#pragma HLS ARRAY_PARTITION variable=coeffACC complete dim=2
+  int coeffACC_0[2][2][4][4];
+  int coeffACC_1[2][2][4][4];
+#pragma HLS ARRAY_PARTITION variable=coeffACC_0 complete dim=3
+#pragma HLS ARRAY_PARTITION variable=coeffACC_0 complete dim=4
+#pragma HLS ARRAY_PARTITION variable=coeffACC_1 complete dim=3
+#pragma HLS ARRAY_PARTITION variable=coeffACC_1 complete dim=4
+
   int i,j;
-  int rMbC[4][4];
-#pragma HLS ARRAY_PARTITION variable=rMbC complete dim=1
-#pragma HLS ARRAY_PARTITION variable=rMbC complete dim=2
+  int rMbC_0[2][2][4][4];
+  int rMbC_1[2][2][4][4];
+#pragma HLS ARRAY_PARTITION variable=rMbC_0 complete dim=3
+#pragma HLS ARRAY_PARTITION variable=rMbC_0 complete dim=4
+#pragma HLS ARRAY_PARTITION variable=rMbC_1 complete dim=3
+#pragma HLS ARRAY_PARTITION variable=rMbC_1 complete dim=4
 
   int mvdC0[2][2][2];
   int mvdC1[2][2][2];
@@ -327,73 +340,117 @@ void process_chroma
 #pragma HLS ARRAY_PARTITION variable=mvdC1 complete dim=3
   int tmpidx0;
   int tmpidx1;
+  int x, y;
   //processing CR component of each sample
-  if(CodedPatternChroma&0x2)
+  //first channel
+  for(y=0;y<2;y++)
+  for(x=0;x<2;x++)
   {
-    nC=nc_Chroma(Imode,NzChroma,mbaddrx*2+x,mbaddry*2+y);
-    NzChroma[mbaddrx*2+x][mbaddry*2+y]=residual_block_cavlc_16(coeffACC,nalu,1,15,nC);
-  }
-  else
-  {
-    NzChroma[mbaddrx*2+x][mbaddry*2+y]=0;
-    for(i=0;i<4;i++)
-      #pragma HLS PIPELINE
-      for(j=0;j<4;j++)
-      {
-        rMbC[i][j]=0;
-        coeffACC[i][j]=0;
-      }
+
+    if(CodedPatternChroma&0x2)
+    {
+      nC=nc_Chroma(Imode,NzChroma[0],mbaddrx*2+x,mbaddry*2+y);
+      NzChroma[0][mbaddrx*2+x][mbaddry*2+y]=residual_block_cavlc_16(coeffACC_0[x][y],nalu,1,15,nC);
+    }
+    else
+    {
+      NzChroma[0][mbaddrx*2+x][mbaddry*2+y]=0;
+      for(i=0;i<4;i++)
+        #pragma HLS PIPELINE
+        for(j=0;j<4;j++)
+        {
+          rMbC_0[x][y][i][j]=0;
+          coeffACC_0[x][y][i][j]=0;
+        }
+    }
   }
 
-  if(CodedPatternChroma&0x3)
-    scale_residual4x4_and_trans_inverse(qPc, qPcm6, temp1c, temp2c, temp3c, coeffACC,rMbC, coeffDCC,1);
+  //second channel
+  for(y=0;y<2;y++)
+  for(x=0;x<2;x++)
+  {
 
-  if(refidx0>=0 && refidx1>=0)
-  {
-    LOOP_COPY: for(i=0;i<2;i++)
-      #pragma HLS PIPELINE
-      for(j=0;j<2;j++)
-      {
-        mvdC0[i][j][0]=mvd0[x*2+i][y*2+j][0];
-        mvdC1[i][j][0]=mvd1[x*2+i][y*2+j][0];
-        mvdC0[i][j][1]=mvd0[x*2+i][y*2+j][1];
-        mvdC1[i][j][1]=mvd1[x*2+i][y*2+j][1];
-      }
-    tmpidx0=img->list0[refidx0];
-    tmpidx1=img->list1[refidx1];
-  }
-  else if(refidx0>=0 && refidx1<0)
-  {
-    LOOP_COPY2: for(i=0;i<2;i++)
-      #pragma HLS PIPELINE
-      for(j=0;j<2;j++)
-      {
-        mvdC0[i][j][0]=mvd0[x*2+i][y*2+j][0];
-        mvdC0[i][j][1]=mvd0[x*2+i][y*2+j][1];
-      }
-    tmpidx0=img->list0[refidx0];
-  }
-  else if(refidx0<0 && refidx1>=0)
-  {
-    LOOP_COPY3: for(i=0;i<2;i++)
-      #pragma HLS PIPELINE
-      for(j=0;j<2;j++)
-      {
-        mvdC0[i][j][0]=mvd1[x*2+i][y*2+j][0];
-        mvdC0[i][j][1]=mvd1[x*2+i][y*2+j][1];
-      }
-    tmpidx0=img->list1[refidx1];
+    if(CodedPatternChroma&0x2)
+    {
+      nC=nc_Chroma(Imode,NzChroma[1],mbaddrx*2+x,mbaddry*2+y);
+      NzChroma[1][mbaddrx*2+x][mbaddry*2+y]=residual_block_cavlc_16(coeffACC_1[x][y],nalu,1,15,nC);
+    }
+    else
+    {
+      NzChroma[1][mbaddrx*2+x][mbaddry*2+y]=0;
+      for(i=0;i<4;i++)
+        #pragma HLS PIPELINE
+        for(j=0;j<4;j++)
+        {
+          rMbC_1[x][y][i][j]=0;
+          coeffACC_1[x][y][i][j]=0;
+        }
+    }
   }
 
-  if(tmpImode==INTRA4x4 || tmpImode== INTRA16x16)
-    write_Chroma(predC,rMbC,PIC[img->mem_idx].SChroma[icrcb],(mbaddrx*2+x)*4,(mbaddry*2+y)*4,tmpImode==INTERSKIP );
-  else if(refidx0>=0 && refidx1>=0)
+
+  for(y=0;y<2;y++)
+  for(x=0;x<2;x++)
   {
-    inter_prediction_chroma_subblock_double(rMbC,mvdC0,mvdC1, PIC[tmpidx0].SChroma[icrcb],PIC[tmpidx1].SChroma[icrcb],PIC[img->mem_idx].SChroma[icrcb],(mbaddrx*2+x)*4,(mbaddry*2+y)*4,(CodedPatternChroma&0x3) !=0);
-  }
-  else
-  {
-    inter_prediction_chroma_subblock_single(rMbC,mvdC0,PIC[tmpidx0].SChroma[icrcb],PIC[img->mem_idx].SChroma[icrcb],(mbaddrx*2+x)*4,(mbaddry*2+y)*4,(CodedPatternChroma&0x3) !=0);
+
+    if(CodedPatternChroma&0x3)
+    {
+      scale_residual4x4_and_trans_inverse(qPc, qPcm6, temp1c, temp2c, temp3c, coeffACC_0[x][y],rMbC_0[x][y], coeffDCC_0[x][y],1);
+      scale_residual4x4_and_trans_inverse(qPc, qPcm6, temp1c, temp2c, temp3c, coeffACC_1[x][y],rMbC_1[x][y], coeffDCC_1[x][y],1);
+    }
+    if(refidx0[x][y]>=0 && refidx1[x][y]>=0)
+    {
+      LOOP_COPY: for(i=0;i<2;i++)
+        #pragma HLS PIPELINE
+        for(j=0;j<2;j++)
+        {
+          mvdC0[i][j][0]=mvd0[x*2+i][y*2+j][0];
+          mvdC1[i][j][0]=mvd1[x*2+i][y*2+j][0];
+          mvdC0[i][j][1]=mvd0[x*2+i][y*2+j][1];
+          mvdC1[i][j][1]=mvd1[x*2+i][y*2+j][1];
+        }
+      tmpidx0=img->list0[refidx0[x][y]];
+      tmpidx1=img->list1[refidx1[x][y]];
+    }
+    else if(refidx0[x][y]>=0 && refidx1[x][y]<0)
+    {
+      LOOP_COPY2: for(i=0;i<2;i++)
+        #pragma HLS PIPELINE
+        for(j=0;j<2;j++)
+        {
+          mvdC0[i][j][0]=mvd0[x*2+i][y*2+j][0];
+          mvdC0[i][j][1]=mvd0[x*2+i][y*2+j][1];
+        }
+      tmpidx0=img->list0[refidx0[x][y]];
+    }
+    else if(refidx0[x][y]<0 && refidx1[x][y]>=0)
+    {
+      LOOP_COPY3: for(i=0;i<2;i++)
+        #pragma HLS PIPELINE
+        for(j=0;j<2;j++)
+        {
+          mvdC0[i][j][0]=mvd1[x*2+i][y*2+j][0];
+          mvdC0[i][j][1]=mvd1[x*2+i][y*2+j][1];
+        }
+      tmpidx0=img->list1[refidx1[x][y]];
+    }
+
+    if(tmpImode==INTRA4x4 || tmpImode== INTRA16x16)
+    {
+      write_Chroma(predC_0[x+y*2],rMbC_0[x][y],PIC[img->mem_idx].SChroma_0,(mbaddrx*2+x)*4,(mbaddry*2+y)*4,tmpImode==INTERSKIP );
+      write_Chroma(predC_1[x+y*2],rMbC_1[x][y],PIC[img->mem_idx].SChroma_1,(mbaddrx*2+x)*4,(mbaddry*2+y)*4,tmpImode==INTERSKIP );
+    }
+    else if(refidx0[x][y]>=0 && refidx1[x][y]>=0)
+    {
+      inter_prediction_chroma_subblock_double(rMbC_0[x][y],mvdC0,mvdC1, PIC[tmpidx0].SChroma_0,PIC[tmpidx1].SChroma_0,PIC[img->mem_idx].SChroma_0,(mbaddrx*2+x)*4,(mbaddry*2+y)*4,(CodedPatternChroma&0x3) !=0);
+      inter_prediction_chroma_subblock_double(rMbC_1[x][y],mvdC0,mvdC1, PIC[tmpidx0].SChroma_1,PIC[tmpidx1].SChroma_1,PIC[img->mem_idx].SChroma_1,(mbaddrx*2+x)*4,(mbaddry*2+y)*4,(CodedPatternChroma&0x3) !=0);
+    }
+    else
+    {
+      inter_prediction_chroma_subblock_single(rMbC_0[x][y],mvdC0,PIC[tmpidx0].SChroma_0,PIC[img->mem_idx].SChroma_0,(mbaddrx*2+x)*4,(mbaddry*2+y)*4,(CodedPatternChroma&0x3) !=0);
+      inter_prediction_chroma_subblock_single(rMbC_1[x][y],mvdC0,PIC[tmpidx0].SChroma_1,PIC[img->mem_idx].SChroma_1,(mbaddrx*2+x)*4,(mbaddry*2+y)*4,(CodedPatternChroma&0x3) !=0);
+    }
+
   }
 }
 
@@ -487,13 +544,16 @@ void ProcessSlice
 
   //prediction matrix
   unsigned char predL[16][4][4];
-  unsigned char predC[2][4][4][4];
-
+  unsigned char predC_0[4][4][4];
+  unsigned char predC_1[4][4][4];
 #pragma HLS ARRAY_PARTITION variable=predL complete dim=2
 #pragma HLS ARRAY_PARTITION variable=predL complete dim=3
 
-#pragma HLS ARRAY_PARTITION variable=predC complete dim=3
-#pragma HLS ARRAY_PARTITION variable=predC complete dim=4
+#pragma HLS ARRAY_PARTITION variable=predC_0 complete dim=2
+#pragma HLS ARRAY_PARTITION variable=predC_0 complete dim=3
+#pragma HLS ARRAY_PARTITION variable=predC_1 complete dim=2
+#pragma HLS ARRAY_PARTITION variable=predC_1 complete dim=3
+
   //quant temp
 
   char qPm6,qPi,qPy,qPc,qPcm6;
@@ -502,15 +562,16 @@ void ProcessSlice
   char scale1,scale2,scale3;
   //residual matrix
   int coeffDCL[4][4];
-  int coeffACL[4][4];
+#pragma HLS ARRAY_PARTITION variable=coeffDCL complete dim=1
+#pragma HLS ARRAY_PARTITION variable=coeffDCL complete dim=2
 
 
-  int coeffDCC[2][4][2];
-#pragma HLS ARRAY_PARTITION variable=coeffDCC complete dim=1
-#pragma HLS ARRAY_PARTITION variable=coeffDCC complete dim=2
-#pragma HLS ARRAY_PARTITION variable=coeffDCC complete dim=3
-
-  int coeffACC[4][4];
+  int coeffDCC_0[4][2];
+  int coeffDCC_1[4][2];
+#pragma HLS ARRAY_PARTITION variable=coeffDCC_0 complete dim=1
+#pragma HLS ARRAY_PARTITION variable=coeffDCC_0 complete dim=2
+#pragma HLS ARRAY_PARTITION variable=coeffDCC_1 complete dim=1
+#pragma HLS ARRAY_PARTITION variable=coeffDCC_1 complete dim=2
 
   int rMbL[4][4];
   int rMbC[4][4];
@@ -767,52 +828,44 @@ void ProcessSlice
         }
         if(CodedPatternChroma&0x3)
         {
-          residual_block_cavlc_4(coeffDCC[0], nalu, 0,3);
-          scale_and_inv_trans_chroma2x2(coeffDCC[0],qPc, qPc%6);
-          residual_block_cavlc_4(coeffDCC[1], nalu, 0,3);
-          scale_and_inv_trans_chroma2x2(coeffDCC[1],qPc, qPc%6);
+          residual_block_cavlc_4(coeffDCC_0, nalu, 0,3);
+          scale_and_inv_trans_chroma2x2(coeffDCC_0,qPc, qPc%6);
+          residual_block_cavlc_4(coeffDCC_1, nalu, 0,3);
+          scale_and_inv_trans_chroma2x2(coeffDCC_1,qPc, qPc%6);
         }
 
         if(tmpImode==INTRA16x16 || tmpImode==INTRA4x4)
         {
-          prediction_Chroma(predC[0],PIC[img->mem_idx].SChroma[0],(mbaddrx>0)*2+(mbaddry>0),mbaddrx*8,mbaddry*8,IntraChromaPredMode);
-          prediction_Chroma(predC[1],PIC[img->mem_idx].SChroma[1],(mbaddrx>0)*2+(mbaddry>0),mbaddrx*8,mbaddry*8,IntraChromaPredMode);
+          prediction_Chroma(predC_0,PIC[img->mem_idx].SChroma_0,(mbaddrx>0)*2+(mbaddry>0),mbaddrx*8,mbaddry*8,IntraChromaPredMode);
+          prediction_Chroma(predC_1,PIC[img->mem_idx].SChroma_1,(mbaddrx>0)*2+(mbaddry>0),mbaddrx*8,mbaddry*8,IntraChromaPredMode);
         }
-        int icrcb;
+        //processing CR component
 
-        for(icrcb=0;icrcb<2;icrcb++)
-          for(y=0;y<2;y++)
-            for(x=0;x<2;x++)
-            {
-              //processing CR component of each sample
-
-              process_chroma(
-                CodedPatternChroma,
-                NzChroma[icrcb],
-                Imode,
-                mbaddrx,
-                mbaddry,
-                x,
-                y,
-                nalu,
-                qPc,
-                qPcm6,
-                temp1c,
-                temp2c,
-                temp3c,
-                coeffDCC[icrcb][x][y],
-                refidx0[x][y],
-                refidx1[x][y],
-                mvd0,
-                mvd1,
-                img,
-                tmpImode,
-                predC[icrcb][x+y*2],
-                PIC,
-                icrcb);
-           }
-        }
+        process_chroma(
+          CodedPatternChroma,
+          NzChroma,
+          Imode,
+          mbaddrx,
+          mbaddry,
+          nalu,
+          qPc,
+          qPcm6,
+          temp1c,
+          temp2c,
+          temp3c,
+          coeffDCC_0,
+          coeffDCC_1,
+          refidx0,
+          refidx1,
+          mvd0,
+          mvd1,
+          img,
+          tmpImode,
+          predC_0,
+          predC_1,
+          PIC);
       }
+    }
 }
 
 

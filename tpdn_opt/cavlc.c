@@ -156,6 +156,8 @@ const unsigned char rbcodtab[7][16] =
 
 void TrailingOnes_TotalCoeff(NALU_t *nalu, unsigned char *TotalCoeff, unsigned char *TrailingZeros, unsigned char nC_range)
 {
+//#pragma HLS PIPELINE
+
   int i;
   int j;
   int len;
@@ -213,6 +215,8 @@ void TrailingOnes_TotalCoeff(NALU_t *nalu, unsigned char *TotalCoeff, unsigned c
 
 void TrailingOnes_TotalCoeff_ChromaDc(NALU_t *nalu, unsigned char *TotalCoeff, unsigned char *TrailingZeros)
 {
+//#pragma HLS PIPELINE
+
   int i,j;
   int len,cod;
   int a, b, c;
@@ -529,6 +533,7 @@ unsigned char residual_block_cavlc_4(int coeffLevel[2][2], NALU_t *nalu,int star
 
   for(i=0;i<4;i++)
   {
+    #pragma HLS UNROLL
     coeffLevel[i/2][i%2]=0;
   }
 
@@ -615,7 +620,7 @@ unsigned char residual_block_cavlc_4(int coeffLevel[2][2], NALU_t *nalu,int star
       zeroLeft=0;
 
     for(i=0;i<totalcoeff-1;i++)
-    {
+    { 
       if(zeroLeft > 0)
       {
         runVal[i]=run_before(nalu, zeroLeft);

@@ -118,7 +118,9 @@ void predict_intra4x4_luma_NonField(
     int starty,
     unsigned int blk)
 {
-#pragma HLS PIPELINE
+//#pragma HLS PIPELINE
+#pragma HLS ARRAY_PARTITION variable=predL complete dim=1
+#pragma HLS ARRAY_PARTITION variable=predL complete dim=2
 
 
   unsigned char P_X, P_A, P_B,P_C,P_D,P_E,P_F,P_G,P_H,P_I,P_J,P_K,P_L;
@@ -205,9 +207,10 @@ void predict_intra4x4_luma_NonField(
 
       for (j=0; j < 4; j++)
       {
-        // HLS PIPELINE
+        #pragma HLS UNROLL
         for (i=0; i <4; i++)
         {
+          #pragma HLS UNROLL
           // store DC prediction
           predL[i][j] = s0;
         }
@@ -220,6 +223,7 @@ void predict_intra4x4_luma_NonField(
 
       for(i=0;i<4;i++)
       {
+        #pragma HLS UNROLL
         predL[0][i]=P_A;
         predL[1][i]=P_B;
         predL[2][i]=P_C;
@@ -231,6 +235,7 @@ void predict_intra4x4_luma_NonField(
 
       for(i=0;i<4;i++)
       {
+        #pragma HLS UNROLL
         predL[i][0]=P_I;
         predL[i][1]=P_J;
         predL[i][2]=P_K;
@@ -310,19 +315,19 @@ void predict_intra4x4_luma_NonField(
 
       predL[0 ][0 ] = (P_A + P_B + 1) / 2;
       predL[1 ][0 ] =
-        predL[0 ][2 ] = (P_B + P_C + 1) / 2;
+      predL[0 ][2 ] = (P_B + P_C + 1) / 2;
       predL[2 ][0 ] =
-        predL[1 ][2 ] = (P_C + P_D + 1) / 2;
+      predL[1 ][2 ] = (P_C + P_D + 1) / 2;
       predL[3 ][0 ] =
-        predL[2 ][2 ] = (P_D + P_E + 1) / 2;
+      predL[2 ][2 ] = (P_D + P_E + 1) / 2;
       predL[3 ][2 ] = (P_E + P_F + 1) / 2;
       predL[0 ][1 ] = (P_A + 2*P_B + P_C + 2) / 4;
       predL[1 ][1 ] =
-        predL[0 ][3 ] = (P_B + 2*P_C + P_D + 2) / 4;
+      predL[0 ][3 ] = (P_B + 2*P_C + P_D + 2) / 4;
       predL[2 ][1 ] =
-        predL[1 ][3 ] = (P_C + 2*P_D + P_E + 2) / 4;
+      predL[1 ][3 ] = (P_C + 2*P_D + P_E + 2) / 4;
       predL[3 ][1 ] =
-        predL[2 ][3 ] = (P_D + 2*P_E + P_F + 2) / 4;
+      predL[2 ][3 ] = (P_D + 2*P_E + P_F + 2) / 4;
       predL[3 ][3 ] = (P_E + 2*P_F + P_G + 2) / 4;
       break;
 
@@ -382,23 +387,36 @@ void predict_intra4x4_luma_NonField(
 
 void predict_intra16x16_luma_NonField(unsigned char predL[16][4][4], unsigned char Sluma[PicWidthInSamplesL][FrameHeightInSampleL] , unsigned char predmode, unsigned char avaiMode, unsigned int startx, unsigned int starty)
 {
+#pragma HLS ARRAY_PARTITION variable=predL complete dim=2
+#pragma HLS ARRAY_PARTITION variable=predL complete dim=3
 
   int i,j,k;
   int x,y;
   unsigned char v[16];
+#pragma HLS ARRAY_PARTITION variable=v dim=1 complete
   unsigned char h[16];
+#pragma HLS ARRAY_PARTITION variable=h dim=1 complete
+
   unsigned char X;
 
   if(avaiMode/2)
-    for(i=0;i<16;i++) h[i]=Sluma[startx-1][starty+i];
+    for(i=0;i<16;i++)
+      #pragma HLS UNROLL
+      h[i]=Sluma[startx-1][starty+i];
   else
-    for(i=0;i<16;i++) h[i]=128;
+    for(i=0;i<16;i++) 
+      #pragma HLS UNROLL
+      h[i]=128;
 
 
   if(avaiMode%2)
-    for(i=0;i<16;i++) v[i]=Sluma[startx+i][starty-1];
+    for(i=0;i<16;i++) 
+      #pragma HLS UNROLL
+      v[i]=Sluma[startx+i][starty-1];
   else
-    for(i=0;i<16;i++)  v[i]=128;
+    for(i=0;i<16;i++)  
+      #pragma HLS UNROLL
+      v[i]=128;
 
 
   if(avaiMode==3)
@@ -413,6 +431,7 @@ void predict_intra16x16_luma_NonField(unsigned char predL[16][4][4], unsigned ch
     case 0:
       {
         for(k=0;k<16;k++)
+          #pragma HLS PIPELINE
           for(i=0;i<4;i++)
             for(j=0;j<4;j++)
             {
@@ -425,6 +444,7 @@ void predict_intra16x16_luma_NonField(unsigned char predL[16][4][4], unsigned ch
     case 1:
       {
         for(k=0;k<16;k++)
+          #pragma HLS PIPELINE
           for(i=0;i<4;i++)
             for(j=0;j<4;j++)
             {
@@ -442,14 +462,14 @@ void predict_intra16x16_luma_NonField(unsigned char predL[16][4][4], unsigned ch
         if(avaiMode%2)
           for(x=0;x<16;x++)
           {
-            // HLS PIPELINE
+            #pragma HLS UNROLL
             sumx=sumx+v[x];
           }
 
         if(avaiMode/2)
           for(y=0;y<16;y++)
           {
-            // HLS PIPELINE
+            #pragma HLS UNROLL
             sumy=sumy+h[y];
           }
 
@@ -470,6 +490,7 @@ void predict_intra16x16_luma_NonField(unsigned char predL[16][4][4], unsigned ch
         }
 
         for(k=0;k<16;k++)
+          #pragma HLS PIPELINE
           for(i=0;i<4;i++)
             for(j=0;j<4;j++)
             {
@@ -491,6 +512,7 @@ void predict_intra16x16_luma_NonField(unsigned char predL[16][4][4], unsigned ch
         a=16*(v[15]+h[15]);
 
         for(k=0;k<16;k++)
+          #pragma HLS PIPELINE
           for(i=0;i<4;i++)
             for(j=0;j<4;j++)
             {
@@ -527,6 +549,9 @@ void prediction_Chroma(
     int starty,
     unsigned char pred_mod)
 {
+#pragma HLS ARRAY_PARTITION variable=predC complete dim=2
+#pragma HLS ARRAY_PARTITION variable=predC complete dim=3
+
 
   unsigned char v[8];
 #pragma HLS ARRAY_PARTITION variable=v complete dim=1
@@ -541,14 +566,22 @@ void prediction_Chroma(
   int temp;
 
   if(avaimode/2)
-    for(i=0;i<8;i++) h[i]=SChroma[startx-1][starty+i];
+    for(i=0;i<8;i++) 
+      #pragma HLS UNROLL
+      h[i]=SChroma[startx-1][starty+i];
   else
-    for(i=0;i<8;i++) h[i]=128;
+    for(i=0;i<8;i++) 
+      #pragma HLS UNROLL
+      h[i]=128;
 
   if(avaimode%2)
-    for(i=0;i<8;i++) v[i]=SChroma[startx+i][starty-1];
+    for(i=0;i<8;i++) 
+      #pragma HLS UNROLL
+      v[i]=SChroma[startx+i][starty-1];
   else
-    for(i=0;i<8;i++)  v[i]=128;
+    for(i=0;i<8;i++)  
+      #pragma HLS UNROLL
+      v[i]=128;
 
   if(avaimode==3)
   {
@@ -572,6 +605,7 @@ void prediction_Chroma(
         {
           for(x=0;x<4;x++)
           {
+            #pragma HLS UNROLL
             js0+=v[x];
             js1+=v[x+4];
           }
@@ -580,6 +614,7 @@ void prediction_Chroma(
         {
           for(y=0;y<4;y++)
           {
+            #pragma HLS UNROLL
             js2+=h[y];
             js3+=h[y+4];
           }

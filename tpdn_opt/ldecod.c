@@ -50,12 +50,12 @@ void write_out_pic(StorablePicture *pic,FILE * p_out)
   for(i=0;i<FrameHeightInSampleC;i++)
     for(j=0; j<PicWidthInSamplesC; j++)
     {
-      fputc(pic->SChroma[0][j][i],p_out);
+      fputc(pic->SChroma_0[j][i],p_out);
     }
   for(i=0;i<FrameHeightInSampleC;i++)
     for(j=0 ;j <PicWidthInSamplesC ;  j++)
     {
-      fputc(pic->SChroma[1][j][i],p_out);
+      fputc(pic->SChroma_1[j][i],p_out);
     }
 
 }
